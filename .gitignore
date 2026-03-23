@@ -1,0 +1,8 @@
+#NOTE: main .gitignore file
+
+.python-version
+
+__pycache__/
+
+*.pt
+*.txt
