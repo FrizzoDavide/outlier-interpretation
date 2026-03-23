@@ -29,20 +29,21 @@ from utils.eval_print_utils import print_eval_runs
 from eval.evaluation_od import evaluation_od, evaluation_od_auc
 from config import root, eva_root, get_parser
 import warnings
+import ipdb
 
 warnings.filterwarnings("ignore")
 
 # ------------------- parser ----------------- #
-algorithm_name = "aton"
 parser = argparse.ArgumentParser()
+parser.add_argument('--algorithm_name', type=str, default="aton", help='name of the interpretation algorithm to use')
 parser.add_argument('--gpu', type=ast.literal_eval, default=True)
 parser.add_argument('--eval', type=ast.literal_eval, default=True, help='Evaluate the interpretation results or not')
-parser.add_argument('--path', type=str, default="data/", help='the input data path, can be a single csv '
-                                                              'or a data folder')
+parser.add_argument('--path', type=str, default="data/", help='the input data path, can be a single csv or a data folder')
 parser.add_argument('--w2s_ratio', type=str, default='real_len', help='\'real-len\', \'auto\', \'pn\', or a ratio.')
 parser.add_argument('--runs', type=int, default=1)
 parser.add_argument('--record_name', type=str, default='')
-parser = get_parser(algorithm_name, parser)
+args = parser.parse_args()
+parser = get_parser(args.algorithm_name, parser)
 args = parser.parse_args()
 
 input_root_list = [root + args.path]
@@ -52,16 +53,16 @@ runs = args.runs
 record_name = args.record_name
 
 # ------------------- record ----------------- #
-if not os.path.exists("record/" + algorithm_name):
-    os.makedirs("record/" + algorithm_name)
+if not os.path.exists("record/" + args.algorithm_name):
+    os.makedirs("record/" + args.algorithm_name)
 if not os.path.exists("checkpoints"):
     os.makedirs("checkpoints/")
-record_path = "record/" + algorithm_name + "/zout." + \
-              algorithm_name + "." + record_name + ".txt"
+record_path = "record/" + args.algorithm_name + "/zout." + \
+              args.algorithm_name + "." + record_name + ".txt"
 doc = open(record_path, 'a')
 tab1 = PrettyTable(["parameter", "value"])
 tab1.add_row(["@ data", str(input_root_list)])
-tab1.add_row(["@ algorithm_name", str(algorithm_name)])
+tab1.add_row(["@ algorithm_name", str(args.algorithm_name)])
 tab1.add_row(["@ w2s_ratio", str(w2s_ratio)])
 tab1.add_row(["@ runs", str(runs)])
 tab1.add_row(["@ od_eval_model", str(od_eval_model)])
@@ -110,7 +111,7 @@ def main(path, run_times):
         time1 = time.time()
 
         # ------------ run the chosen algorithm to get interpretation (feature weight) ------------- #
-        fea_weight_lst = run_model(algorithm_name, X, y)
+        fea_weight_lst = run_model(args.algorithm_name, X, y)
 
         # ------------------- transfer feature weight to subspace ----------------- #
         subspace_outputs = []
@@ -137,14 +138,14 @@ def main(path, run_times):
     if args.eval:
         name = path.split("/")[-1].split(".")[0]
         for mm in range(len(od_eval_model)):
-            txt = print_eval_runs(runs_metric_lst[mm], data_name=name, algo_name=algorithm_name)
+            txt = print_eval_runs(runs_metric_lst[mm], data_name=name, algo_name=args.algorithm_name)
             print(txt)
 
             doc = open(record_path, 'a')
             print(txt, file=doc)
             doc.close()
     else:
-        txt = data_name + "," + str(round(t, 2)) + "," + algorithm_name
+        txt = data_name + "," + str(round(t, 2)) + "," + args.algorithm_name
         print(txt)
         doc = open(record_path, 'a')
         print(txt, file=doc)
