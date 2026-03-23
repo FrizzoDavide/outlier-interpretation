@@ -5,12 +5,18 @@ This script implements an outlier interpretation method of the following paper:
 @ email: hongzuo.xu@gmail.com or leogarcia@126.com or xuhongzuo13@nudt.edu.cn
 """
 
+import os
+import random
+import string
 
+import ipdb
 import numpy as np
 import torch
-import random, string
-import os
-mask = ''.join(random.sample(string.ascii_letters, 8))
+
+from utils.utils import get_current_time
+
+mask = "".join(random.sample(string.ascii_letters, 8))
+mask = get_current_time()
 
 
 def min_max_normalize(x):
@@ -29,8 +35,20 @@ def min_max_normalize(x):
 
 class EarlyStopping:
     """Early stops the training if validation loss doesn't improve after a given patience."""
-    def __init__(self, patience=7, verbose=False, delta=0, path="checkpoints/" + mask + '_checkpoint.pt', trace_func=print):
+
+    def __init__(
+        self,
+        patience=7,
+        verbose=False,
+        delta=0,
+        path="checkpoints/" + mask + "_checkpoint.pt",
+        trace_func=print,
+    ):
         """
+        This class is needed to save the model checkpoint everytime the validation loss
+        decreases. The file name is always the same so that at the end we are left with the
+        checkpoint of the best model
+
         Args:
             patience (int): How long to wait after last time validation loss improved.
                             Default: 7
@@ -71,6 +89,9 @@ class EarlyStopping:
     def save_checkpoint(self, val_loss, model):
         """Saves model when validation loss decrease."""
         if self.verbose:
-            self.trace_func(f'Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving model ...')
+            self.trace_func(
+                f"Validation loss decreased ({self.val_loss_min:.6f} --> {val_loss:.6f}).  Saving model ..."
+            )
         torch.save(model.state_dict(), self.path)
         self.val_loss_min = val_loss
+

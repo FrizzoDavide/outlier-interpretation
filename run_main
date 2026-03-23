@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+script_path="main.py"
+
+echo "--------------------------------------------"
+echo "Running $script_path"
+echo "--------------------------------------------"
+
+dataset_name="00-pima"
+n_runs=1
+w2s_ratio="real-len"
+device_num=2
+
+python "$script_path" \
+  --dataset_name "$dataset_name" \
+  --path "data/" \
+  --gpu \
+  --device_num $device_num \
+  --runs $n_runs \
+  --w2s_ratio "$w2s_ratio"
