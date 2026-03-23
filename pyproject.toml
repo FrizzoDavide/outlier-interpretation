@@ -1,0 +1,9 @@
+[project]
+name = "outlier-interpretation"
+version = "0.1.0"
+description = "Reproduction of outlier-interpretation project code for exiffi-ind project"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "ipdb>=0.13.13",
+]
